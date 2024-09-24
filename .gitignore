@@ -1,0 +1,5 @@
+srenv/
+migrations/
+static/
+db_populate.py
+__pycache__/
