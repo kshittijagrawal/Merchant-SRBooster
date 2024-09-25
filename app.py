@@ -9,10 +9,11 @@ import hashlib
 import time
 import random
 import string
+import os
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://kshitij:kshitij@localhost:5432/merchant_sr'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://kshitij:ZJUdsmeUDurJE7d1kv02J6Lp7jmQcPip@dpg-crpknk88fa8c73e3j1pg-a.oregon-postgres.render.com/merchant_sr_booster'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("RENDER_DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
