@@ -1,0 +1,299 @@
+openapi: 3.0.0
+info:
+  title: Merchant SR Booster APIs
+  version: 1.0.0
+  description: API for managing features, merchants, and requests in the Merchant SR system
+
+paths:
+  /features:
+    get:
+      summary: Get all features
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feature"
+
+  /features/{feature_id}:
+    get:
+      summary: Get a specific feature
+      parameters:
+        - in: path
+          name: feature_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feature"
+        "404":
+          description: Feature not found
+
+  /merchants/{merchant_id}:
+    get:
+      summary: Get a specific merchant
+      parameters:
+        - in: path
+          name: merchant_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Merchant"
+        "404":
+          description: Merchant not found
+
+  /merchants/{merchant_id}/features:
+    get:
+      summary: Get features for a specific merchant
+      parameters:
+        - in: path
+          name: merchant_id
+          required: true
+          schema:
+            type: string # Changed from integer to string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Feature"
+        "404":
+          description: Merchant not found
+
+  /merchants/{merchant_id}/sr-booster:
+    get:
+      summary: Get SR Booster for a specific merchant
+      parameters:
+        - in: path
+          name: merchant_id
+          required: true
+          schema:
+            type: string # Changed from integer to string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  merchant:
+                    $ref: "#/components/schemas/Merchant"
+        "404":
+          description: Merchant not found
+
+  /requests:
+    post:
+      summary: Create a new feature request
+      requestBody:
+        description: Feature request object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request"
+      responses:
+        "201":
+          description: Request created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  request_id:
+                    type: string # Changed from integer to string
+        "404":
+          description: Merchant not found
+
+    get:
+      summary: Get all requests
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+
+  /requests/{request_id}:
+    get:
+      summary: Get a specific request
+      parameters:
+        - in: path
+          name: request_id
+          required: true
+          schema:
+            type: string # Changed from integer to string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        "404":
+          description: Request not found
+
+  /admin/pending-approvals:
+    get:
+      summary: Get pending approvals for feature requests
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+
+  /admin/requests/{request_id}/approve:
+    patch: # Changed to PATCH
+      summary: Approve a feature request
+      parameters:
+        - in: path
+          name: request_id
+          required: true
+          schema:
+            type: string # Changed from integer to string
+      responses:
+        "200":
+          description: Request approved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  request_id:
+                    type: string # Changed from integer to string
+                    description: The ID of the approved request
+                  status:
+                    type: string
+                    description: The new status of the request
+                  updated_at:
+                    type: string
+                    format: date-time
+        "404":
+          description: Request not found
+        "400":
+          description: Request cannot be approved; it is not pending
+
+  /admin/requests/{request_id}/reject:
+    patch: # Changed to PATCH
+      summary: Reject a feature request
+      parameters:
+        - in: path
+          name: request_id
+          required: true
+          schema:
+            type: string # Changed from integer to string
+      responses:
+        "200":
+          description: Request rejected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  request_id:
+                    type: string # Changed from integer to string
+                    description: The ID of the rejected request
+                  status:
+                    type: string
+                    description: The new status of the request
+                  updated_at:
+                    type: string
+                    format: date-time
+        "404":
+          description: Request not found
+        "400":
+          description: Request cannot be rejected; it is not pending
+
+components:
+  schemas:
+    Feature:
+      type: object
+      properties:
+        feature_id:
+          type: string # Changed from integer to string
+        feature_name:
+          type: string
+        method:
+          type: string
+        description:
+          type: string
+        category_types:
+          type: array
+          items:
+            type: string
+        checkout_types:
+          type: array
+          items:
+            type: string
+        feature_flag:
+          type: string
+
+    Merchant:
+      type: object
+      properties:
+        merchant_id:
+          type: string # Changed from integer to string
+        merchant_name:
+          type: string
+        gmv:
+          type: number
+        tier:
+          type: string
+        current_overall_sr:
+          type: number
+        predicted_overall_sr:
+          type: number
+
+    Request:
+      type: object
+      properties:
+        request_id:
+          type: string # Changed from integer to string
+        mid:
+          type: string
+        feature_id:
+          type: string # Changed from integer to string
+        method:
+          type: string
+        feature_name:
+          type: string
+        feature_flag:
+          type: string
+        state:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
