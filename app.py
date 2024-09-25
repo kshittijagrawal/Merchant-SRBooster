@@ -88,8 +88,8 @@ def get_features():
         'feature_name': f.feature_name,
         'method': f.method,
         'description': f.description,
-        'category_types': json.loads(f.category_types),
-        'checkout_types': json.loads(f.checkout_types)
+        'category_types': f.category_types,  # No need for json.loads here
+        'checkout_types': f.checkout_types   # No need for json.loads here
     } for f in features]
     
     return jsonify(features_data), 200
@@ -103,8 +103,8 @@ def get_feature(feature_id):
     return jsonify({
         'feature_id': feature.feature_id,
         'method': feature.method,
-        'category_types': json.loads(feature.category_types),
-        'checkout_types': json.loads(feature.checkout_types),
+        'category_types': feature.category_types,  # No need for json.loads
+        'checkout_types': feature.checkout_types,  # No need for json.loads
         'feature_name': feature.feature_name,
         'feature_flag': feature.feature_flag,
         'description': feature.description
@@ -121,13 +121,13 @@ def get_merchant(mid):
         'merchant_name': merchant.merchant_name,
         'mx_category_type': merchant.mx_category_type,
         'mx_checkout_type': merchant.mx_checkout_type,
-        'mx_methods': json.loads(merchant.mx_methods),
+        'mx_methods': merchant.mx_methods,  # No need for json.loads
         'gmv': merchant.gmv,
         'tier': merchant.tier,
         'current_overall_sr': merchant.current_overall_sr,
         'predicted_overall_sr': merchant.predicted_overall_sr,
-        'current_method_specific_sr': json.loads(merchant.current_method_specific_sr),
-        'predicted_method_specific_sr': json.loads(merchant.predicted_method_specific_sr)
+        'current_method_specific_sr': merchant.current_method_specific_sr,  # No need for json.loads
+        'predicted_method_specific_sr': merchant.predicted_method_specific_sr  # No need for json.loads
     }), 200
 
 @app.route('/merchants/<string:mid>/features', methods=['GET'])
@@ -137,9 +137,9 @@ def get_merchant_features(mid):
         return jsonify({'error': 'Merchant not found'}), 404
 
     relevant_features = Feature.query.filter(
-        Feature.method.in_(json.loads(merchant.mx_methods)),
-        Feature.category_types.contains(json.dumps(merchant.mx_category_type)),
-        Feature.checkout_types.contains(json.dumps(merchant.mx_checkout_type))
+        Feature.method.in_(merchant.mx_methods),
+        Feature.category_types.contains(merchant.mx_category_type),
+        Feature.checkout_types.contains(merchant.mx_checkout_type)
     ).all()
     
     methods_features_data = {}
@@ -151,8 +151,8 @@ def get_merchant_features(mid):
             'feature_name': feature.feature_name,
             'feature_flag': feature.feature_flag,
             'description': feature.description,
-            'category_types': json.loads(feature.category_types),
-            'checkout_types': json.loads(feature.checkout_types)
+            'category_types': feature.category_types,  # No need for json.loads
+            'checkout_types': feature.checkout_types   # No need for json.loads
         })
     
     return jsonify(methods_features_data), 200
@@ -168,8 +168,8 @@ def get_sr_booster(mid):
             'merchant_name': merchant.merchant_name,
             'current_overall_sr': merchant.current_overall_sr,
             'predicted_overall_sr': merchant.predicted_overall_sr,
-            'current_method_specific_sr': json.loads(merchant.current_method_specific_sr),
-            'predicted_method_specific_sr': json.loads(merchant.predicted_method_specific_sr)
+            'current_method_specific_sr': merchant.current_method_specific_sr,  # No need for json.loads
+            'predicted_method_specific_sr': merchant.predicted_method_specific_sr  # No need for json.loads
         }
     }), 200
 
@@ -242,7 +242,7 @@ def get_request_by_id(request_id):
         'status': request_entry.status,
         'created_at': request_entry.created_at,
         'updated_at': request_entry.updated_at,
-        'pricing_config': json.loads(request_entry.pricing_config) if request_entry.pricing_config else {}
+        'pricing_config': json.loads(request_entry.pricing_config) if request_entry.pricing_config else {}  # Keep this as it might not be JSON in the DB
     }
 
     return jsonify(request_data), 200
